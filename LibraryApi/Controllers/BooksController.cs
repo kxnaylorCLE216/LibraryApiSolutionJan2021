@@ -17,11 +17,17 @@ namespace LibraryApi.Controllers
         private readonly IMapper _mapper;
         private readonly MapperConfiguration _config;
 
-        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config)
+        private readonly IBookCommands _bookCommands;
+
+        private readonly ILookupBooks _bookLookup;
+
+        public BooksController(LibraryDataContext context, IMapper mapper, MapperConfiguration config, ILookupBooks bookLookup, IBookCommands bookCommands = null)
         {
             _context = context;
             _mapper = mapper;
             _config = config;
+            _bookLookup = bookLookup;
+            _bookCommands = bookCommands;
         }
 
         // PUT /books/{id}/genre
@@ -43,12 +49,14 @@ namespace LibraryApi.Controllers
         [HttpDelete("books/{id:int}")]
         public async Task<ActionResult> RemoveBookFromInventory(int id)
         {
-            var storedBook = await _context.GetBooksInInventory().SingleOrDefaultAsync(b => b.Id == id);
-            if(storedBook != null)
-            {
-                storedBook.IsInInventory = false;
-                await _context.SaveChangesAsync();
-            }
+            //var storedBook = await _context.GetBooksInInventory().SingleOrDefaultAsync(b => b.Id == id);
+            //if(storedBook != null)
+            //{
+            //    storedBook.IsInInventory = false;
+            //    await _context.SaveChangesAsync();
+            //}
+
+            await _bookCommands.RemoveBookFromInventory(id);
 
             return NoContent();
         }
@@ -87,10 +95,12 @@ namespace LibraryApi.Controllers
         [HttpGet("books/{id:int}", Name ="books#getbookbyid")]
         public async Task<ActionResult> GetBookById(int id)
         {
-            var response = await _context.GetBooksInInventory()
-                .ProjectTo<GetBookDetailsResponse>(_config)
-                .Where(b => b.Id == id)
-                .SingleOrDefaultAsync();
+            //var response = await _context.GetBooksInInventory()
+            //    .ProjectTo<GetBookDetailsResponse>(_config)
+            //    .Where(b => b.Id == id)
+            //    .SingleOrDefaultAsync();
+
+            GetBookDetailsResponse response = await _bookLookup.GetBookById(id);
 
             if(response == null)
             {
@@ -104,17 +114,19 @@ namespace LibraryApi.Controllers
         [HttpGet("books")]
         public async Task<ActionResult> GetAllBooks([FromQuery] string genre = "All")
         {
-            var response = new GetBooksResponse();
-            var booksQuery = _context.GetBooksInInventory()
-                .ProjectTo<GetBooksResponseItem>(_config);
+            //var response = new GetBooksResponse();
+            //var booksQuery = _context.GetBooksInInventory()
+            //    .ProjectTo<GetBooksResponseItem>(_config);
 
-            if (genre != "All")
-            {
-                booksQuery = booksQuery.Where(b => b.Genre == genre);
-            }
-            response.Data = await booksQuery.ToListAsync();
-            response.NumberOfBooks = response.Data.Count;
-            response.Genre = genre;
+            //if (genre != "All")
+            //{
+            //    booksQuery = booksQuery.Where(b => b.Genre == genre);
+            //}
+            //response.Data = await booksQuery.ToListAsync();
+            //response.NumberOfBooks = response.Data.Count;
+            //response.Genre = genre;
+
+            GetBooksResponse response = await _bookLookup.GetBooks(genre);
             return Ok(response);
         }
     }

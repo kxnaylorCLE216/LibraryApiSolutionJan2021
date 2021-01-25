@@ -35,6 +35,10 @@ namespace LibraryApi
             IMapper mapper = mapperConfiguration.CreateMapper();
             services.AddSingleton<IMapper>(mapper);
             services.AddSingleton<MapperConfiguration>(mapperConfiguration);
+            services.AddScoped<ILookupBooks, EfSqlBooks>();
+            services.AddScoped<IBookCommands, EfSqlBooks>();
+
+            services.AddTransient<IFormatNames, FormalFormatting>();
 
             services.AddDbContext<LibraryDataContext>(cfg =>
             {
