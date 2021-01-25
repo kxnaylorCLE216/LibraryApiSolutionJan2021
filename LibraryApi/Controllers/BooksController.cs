@@ -54,28 +54,28 @@ namespace LibraryApi.Controllers
         {
             // 1. Do validation.
             //    - If it isn't valid, return a 400, perhaps with some information.
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState); // 400
-            }
-            else
-            {
-                // 2. Change the domain (do the work)
-                //    - add the book to the database
-                // PostBookRequest -> Book
-                var bookToAdd = _mapper.Map<Book>(request);
-                _context.Books.Add(bookToAdd);
-                await _context.SaveChangesAsync();
+            //if (!ModelState.IsValid)
+            //{
+            //    return BadRequest(ModelState); // 400
+            //}
+            //else
+            //{
+            // 2. Change the domain (do the work)
+            //    - add the book to the database
+            // PostBookRequest -> Book
+            var bookToAdd = _mapper.Map<Book>(request);
+            _context.Books.Add(bookToAdd);
+            await _context.SaveChangesAsync();
 
-                // 3. Return:
-                //    - Status Code 201 (Created)
-                //    - Add a birth announcement. That is a location header with the URL of
-                //      the newly created resource. e.g. Location: http://localhost:1337/books/42
-                //    - It is super nice to just give them a copy of the newly created resource
-                //      This must be exactly the same as they would get by following the location header.
-                var response = _mapper.Map<GetBookDetailsResponse>(bookToAdd);
-                return CreatedAtRoute("books#getbookbyid", new { id = response.Id }, response);
-            }
+            // 3. Return:
+            //    - Status Code 201 (Created)
+            //    - Add a birth announcement. That is a location header with the URL of
+            //      the newly created resource. e.g. Location: http://localhost:1337/books/42
+            //    - It is super nice to just give them a copy of the newly created resource
+            //      This must be exactly the same as they would get by following the location header.
+            var response = _mapper.Map<GetBookDetailsResponse>(bookToAdd);
+            return CreatedAtRoute("books#getbookbyid", new { id = response.Id }, response);
+            //}
         }
 
         [HttpGet("books/{id:int}", Name = "books#getbookbyid")]

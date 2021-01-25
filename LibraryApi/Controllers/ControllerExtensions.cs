@@ -1,8 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace LibraryApi.Controllers
 {
@@ -10,11 +6,9 @@ namespace LibraryApi.Controllers
     {
         public static ActionResult Maybe<T>(this ControllerBase c, T obj)
         {
-
-            if(obj == null)
+            if (obj == null)
             {
                 return new NotFoundResult();
-
             }
             else
             {

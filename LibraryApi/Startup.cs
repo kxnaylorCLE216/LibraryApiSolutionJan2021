@@ -9,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-
 namespace LibraryApi
 {
     public class Startup
@@ -24,7 +23,6 @@ namespace LibraryApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             var mapperConfiguration = new MapperConfiguration(c =>
             {
                 c.AddProfile(new BookProfile());
@@ -36,6 +34,12 @@ namespace LibraryApi
             services.AddSingleton<MapperConfiguration>(mapperConfiguration);
             services.AddScoped<ILookupBooks, EfSqlBooks>();
             services.AddScoped<IBookCommands, EfSqlBooks>();
+            services.AddTransient<ICatalog, RedisCatalog>();
+
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("redis");
+            });
 
             services.AddTransient<IFormatNames, FormalFormatting>();
 
@@ -59,8 +63,8 @@ namespace LibraryApi
                     Version = "1.0",
                     Contact = new Microsoft.OpenApi.Models.OpenApiContact
                     {
-                        Name="Jeff Gonzalez",
-                        Email="jeff@hypertheory.com"
+                        Name = "Jeff Gonzalez",
+                        Email = "jeff@hypertheory.com"
                     },
                     Description = "This is for Training"
                 });

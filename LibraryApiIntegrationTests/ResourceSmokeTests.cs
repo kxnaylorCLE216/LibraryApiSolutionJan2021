@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,10 +7,10 @@ namespace LibraryApiIntegrationTests
     public class ResourceSmokeTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _client;
+
         public ResourceSmokeTests(CustomWebApplicationFactory factory)
         {
             _client = factory.CreateDefaultClient();
-
         }
 
         [Theory]
@@ -26,7 +23,5 @@ namespace LibraryApiIntegrationTests
 
             Assert.True(response.IsSuccessStatusCode); // 200-299
         }
-
-        
     }
 }

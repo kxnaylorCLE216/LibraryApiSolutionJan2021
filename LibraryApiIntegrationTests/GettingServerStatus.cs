@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -43,15 +41,13 @@ namespace LibraryApiIntegrationTests
             var content = await response.Content.ReadAsAsync<GetStatusResponse>();
 
             Assert.Equal("Tacos are good.", content.message);
-            Assert.Equal(new DateTime(1969,4,20,23,59,00), content.lastChecked);
+            Assert.Equal(new DateTime(1969, 4, 20, 23, 59, 00), content.lastChecked);
         }
     }
-
 
     public class GetStatusResponse
     {
         public string message { get; set; }
         public DateTime lastChecked { get; set; }
     }
-
 }

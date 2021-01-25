@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace LibraryApiIntegrationTests
@@ -16,9 +15,9 @@ namespace LibraryApiIntegrationTests
         }
 
         [Theory]
-        [InlineData(2,2,4)]
-        [InlineData(2,3,5)]
-        [InlineData(10,2,12)]
+        [InlineData(2, 2, 4)]
+        [InlineData(2, 3, 5)]
+        [InlineData(10, 2, 12)]
         public void CanAddTwoNumbers(int a, int b, int expected)
         {
             var answer = a + b;
