@@ -1,6 +1,6 @@
 ﻿namespace LibraryApi
 {
-   public interface IFormatNames
+    public interface IFormatNames
     {
         string FormatName(string first, string last);
     }
