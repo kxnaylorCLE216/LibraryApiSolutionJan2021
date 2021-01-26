@@ -56,5 +56,12 @@ namespace LibraryApi.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task UpdateBookGenre(int id, string genre)
+        {
+            var storedBook = await _context.GetBooksInInventory().SingleOrDefaultAsync(b => b.Id == id);
+                storedBook.Genre = genre; // you need to validate it.
+                await _context.SaveChangesAsync();
+        }
     }
 }
