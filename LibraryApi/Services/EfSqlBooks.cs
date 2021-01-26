@@ -57,11 +57,38 @@ namespace LibraryApi.Services
             }
         }
 
-        public async Task UpdateBookGenre(int id, string genre)
+        public async Task<bool> UpdateBookGenre(int id, string genre)
         {
             var storedBook = await _context.GetBooksInInventory().SingleOrDefaultAsync(b => b.Id == id);
+            if (storedBook != null)
+            {
                 storedBook.Genre = genre; // you need to validate it.
                 await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<GetBookDetailsResponse> AddBookToInventory(PostBookRequest request)
+        {
+            // PostBookRequest -> Book
+            var bookToAdd = _mapper.Map<Book>(request);
+            _context.Books.Add(bookToAdd);
+            await _context.SaveChangesAsync();
+
+            // 3. Return:
+            //    - Status Code 201 (Created)
+            //    - Add a birth announcement. That is a location header with the URL of
+            //      the newly created resource. e.g. Location: http://localhost:1337/books/42
+            //    - It is super nice to just give them a copy of the newly created resource
+            //      This must be exactly the same as they would get by following the location header.
+            GetBookDetailsResponse response = _mapper.Map<GetBookDetailsResponse>(bookToAdd);
+
+            return response;
+            //return CreatedAtRoute("books#getbookbyid", new { id = response.Id }, response);
         }
     }
 }
