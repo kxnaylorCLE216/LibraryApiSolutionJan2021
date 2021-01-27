@@ -1,5 +1,6 @@
 using AutoMapper;
 using LibraryApi.Domain;
+using LibraryApi.Models.Options;
 using LibraryApi.Profiles;
 using LibraryApi.Services;
 using Microsoft.AspNetCore.Builder;
@@ -8,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RabbitMqUtils;
+using System.Text.Json.Serialization;
 
 namespace LibraryApi
 {
@@ -23,15 +26,26 @@ namespace LibraryApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var configForMessage = new MessagesOptions();
+
+            services.Configure<MessagesOptions>(
+                Configuration.GetSection(configForMessage.SectionName)
+                );
+
             var mapperConfiguration = new MapperConfiguration(c =>
             {
                 c.AddProfile(new BookProfile());
                 // add additional profiles here...
+                c.AddProfile(new ReservationProfile());
             });
 
             IMapper mapper = mapperConfiguration.CreateMapper();
             services.AddSingleton<IMapper>(mapper);
             services.AddSingleton<MapperConfiguration>(mapperConfiguration);
+
+            services.AddRabbit(Configuration);
+            services.AddScoped<IProcessReservation, RabbitMqReservationProcessor>();
+
             services.AddScoped<ILookupBooks, EfSqlBooks>();
             services.AddScoped<IBookCommands, EfSqlBooks>();
             services.AddTransient<ICatalog, RedisCatalog>();
@@ -53,7 +67,12 @@ namespace LibraryApi
             services.AddScoped<IGetServerStatus, DrashtiServerStatus>();
             // AddSingleton - create one instance, and share it with everyone. NOTE: Must be thread safe.
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                });
 
             services.AddSwaggerGen(config =>
             {
